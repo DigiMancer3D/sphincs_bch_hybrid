@@ -32,6 +32,32 @@ Key areas of exploration include:
 
 ---
 
+## Prerequisites 
+
+Before building, you need the following development libraries installed:
+
+| Library       | Purpose                          | Debian/Ubuntu package      | Fedora/RHEL package       | macOS (Homebrew) |
+|---------------|----------------------------------|----------------------------|---------------------------|------------------|
+| **liboqs**    | SLH-DSA / SPHINCS+ (post-quantum) | `liboqs-dev`              | `liboqs-devel`           | `liboqs`        |
+| **libjansson**| JSON parsing & generation       | `libjansson-dev`          | `jansson-devel`          | `jansson`       |
+| **OpenSSL**   | EC (secp256k1), SHA, etc.       | `libssl-dev`              | `openssl-devel`          | `openssl`       |
+
+**Quick install commands:**
+
+```bash
+# Debian / Ubuntu
+sudo apt update
+sudo apt install liboqs-dev libjansson-dev libssl-dev
+
+# Fedora / RHEL / Rocky
+sudo dnf install liboqs-devel jansson-devel openssl-devel
+
+# macOS
+brew install liboqs jansson openssl
+```
+
+---
+
 ## Quick Start
 
 ### Build
@@ -66,6 +92,103 @@ See [USAGE.md](USAGE.md) for detailed instructions.
 |------------|--------------|--------------------------------------------------|
 | Keychain   | `.kbch`      | Main output containing EC keys and SPHINCS+ data |
 | Proof      | `.bchkproof` | Transaction binding and metadata                 |
+
+---
+
+## Setup(s) [various]
+
+**Easy one-command setup (recommended):**
+
+```bash
+make setup-progs
+```
+
+This automatically:
+1. Creates the initial folder structure.
+2. Downloads the **official SPHINCS+ (SLH-DSA) reference implementation twice** — once into `prog1/` and once into `prog2/`.
+3. Leaves you ready to overlay any "changed files" from this git repo on top if you are patching the reference code.
+
+After running it you can do:
+
+```bash
+make prog1
+make prog2
+make all-progs
+```
+
+**Intended original workflow:**
+1. Create main working folder.
+2. Download official SPHINCS+ ref **twice** into `prog1/` and `prog2/`.
+3. Overlay the changed files from this git repo.
+4. Build with the special Makefile.
+
+**Current status & recommendation:**  
+The main program (`bch_pqc_hybrid_single`) handles SLH-DSA/SPHINCS+ (cleaner & easier for users).  
+
+The Makefile is written so that forgetting the prog setup **never breaks** the normal build.
+
+
+### Manual Setup (Alternative [adapted from the older sphincs-btc-pipeline project])
+
+If you prefer the classic step-by-step manual process (as documented in the predecessor project https://github.com/DigiMancer3D/sphincs-btc-pipeline), here is the equivalent for this BCH hybrid version:
+
+```bash
+# 1. Create / enter your main working folder
+mkdir -p sphincs_bch_hybrid
+cd sphincs_bch_hybrid
+
+# 2. (Optional but recommended) Install the easy dependencies first
+make install-deps   # or manually install liboqs-dev, libjansson-dev, libssl-dev
+
+# 3. Get the official SPHINCS+ (SLH-DSA) reference implementation
+git clone https://github.com/sphincs/sphincsplus.git ref-source
+
+# 4. Create the two working folders (this is the "download twice" part)
+mkdir -p prog1 prog2
+
+# 5. Copy the reference implementation into BOTH folders
+cp -r ref-source/ref/* prog1/
+cp -r ref-source/ref/* prog2/
+
+# 6. (Optional) Overlay any changed/patched files from this hybrid repo
+#    into prog1/ and/or prog2/ if you are modifying the reference code itself.
+#    The main hybrid program lives in the root as bch_pqc_hybrid_single.c
+#    and uses liboqs, so no changes to prog1/prog2 are required for normal use.
+
+# 7. Build the main hybrid program (recommended path)
+make clean && make
+
+# 8. (Legacy path) If you want to build inside the prog folders
+cd prog1
+make clean && make   # only if prog1/ has its own Makefile
+
+cd ../prog2
+make clean && make
+```
+
+**Notes for this BCH version:**
+- The main program (`bch_pqc_hybrid_single`) does **not** require anything inside `prog1/` or `prog2/`. It links against the system library.
+- The `prog1/` and `prog2/` folders are only needed if you want the raw reference sources for inspection, custom parameter experiments, or applying patches.
+- The one-command `make setup-progs` does steps 3-5 automatically for you.
+- This manual process is provided for users coming from the older `sphincs-btc-pipeline` project who are used to this workflow.
+
+---
+
+
+
+## Build Details
+
+The project uses a custom `Makefile` with the following main targets:
+
+| Target          | Description |
+|-----------------|-------------|
+| `make` / `make all` | Build `bch_pqc_hybrid_single` (uses liboqs) — recommended for normal use |
+| `make clean`        | Remove the binary |
+| `make setup-progs`  | **Download official SPHINCS+ ref into prog1/ + prog2/** (the "twice" setup) |
+| `make prog1`        | Build inside prog1/ (auto-suggests setup-progs if missing) |
+| `make prog2`        | Build inside prog2/ (auto-suggests setup-progs if missing) |
+| `make all-progs`    | Build both legacy prog dirs |
+| `make install-deps` | Show dependency installation commands (does not install) |
 
 ---
 
