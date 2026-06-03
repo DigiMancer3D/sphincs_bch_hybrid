@@ -153,7 +153,6 @@ cp -r ref-source/ref/* prog2/
 # 6. (Optional) Overlay any changed/patched files from this hybrid repo
 #    into prog1/ and/or prog2/ if you are modifying the reference code itself.
 #    The main hybrid program lives in the root as bch_pqc_hybrid_single.c
-#    and uses liboqs, so no changes to prog1/prog2 are required for normal use.
 
 # 7. Build the main hybrid program (recommended path)
 make clean && make
