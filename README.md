@@ -1,36 +1,34 @@
-
 # BCH PQC Hybrid
 
 **Post-Quantum Cryptography Hybrid Tool for Bitcoin Cash**
 
-A proof-of-concept tool that combines classical secp256k1 keys with SPHINCS+ (SLH-DSA) post-quantum signatures for Bitcoin Cash. It generates realistic-spendable EC keys while also producing linked SPHINCS+ material and alternative address formats using double-SHAKE256 reductions.
+A proof-of-concept tool that combines classical secp256k1 keys with SPHINCS+ (SLH-DSA) post-quantum signatures for Bitcoin Cash. It generates realistic secp256k1 private keys while also producing linked SPHINCS+ material and alternative address formats using domain-separated SHAKE256 reductions.
 
 ---
 
 ## Motivation
 
-If we can get a set of keys both traditional and PQC from the same starting material then we should be able to sign to priv in a manner that would allow for the SPHINCS+ output to be the private key of the paired address. 
+This project explores whether it is possible to derive both classical and post-quantum keys from the same source material in a way that creates a strong cryptographic link between them. The goal is to experiment with hybrid key derivation that could support a gradual transition toward quantum resistance without immediately breaking existing Bitcoin Cash infrastructure.
 
-This project experiments with:
+Key areas of exploration include:
 - Hybrid key derivation (classical & post-quantum)
-- Deterministic linkage between EC keys and SPHINCS+ signatures 
+- Deterministic linkage between EC keys and SPHINCS+ signatures
 - Alternative address generation using domain-separated SHAKE256 reductions
-- Structured use of SPHINCS+ to get lowered size outputs, allowing control of SPHINCS+ sized outputs that can be returned to full-size if an official PQC upgrade was to occur with SPHINCS+ in mind.
-- Explore practical ways to sign toward quantum resistance without breaking existing infrastructure.
+- Structured control over SPHINCS+ output sizes
 
 ---
 
 ## Features
 
-- Generates realistic spendable secp256k1 private keys
+- Generates realistic secp256k1 private keys compatible with current BCH wallet formats
 - Binds SPHINCS+ signatures to transaction data
-- Produces two address styles from the same payload:
-  - `standard_bch_checksum` — Double-SHA256 (normal BCH-valid style)
-  - `pq_checksum` — Double-SHAKE256 (custom PQ-linked style)
-- Outputs clean, labeled JSON files with custom extensions (the json extensions just helps identify which are proofs and keys for this demostration):
-  - `.kbch` — Main key material "Kinda-different" BCH
-  - `.bchkproof` — Transaction "Kinda-binding" proof
-- Includes a `sphincs_btc_pipeline_style` section for additional contextual output styles that are possible with SPHINCS+
+- Produces two address formats from the same payload:
+  - `standard_bch_checksum` — Uses double-SHA256 (standard BCH-style)
+  - `pq_checksum` — Uses double-SHAKE256 (custom PQ-linked style)
+- Outputs structured files using custom extensions:
+  - `.kbch` — Main key material
+  - `.bchkproof` — Transaction binding proof
+- Includes a `sphincs_btc_pipeline_style` section for additional SPHINCS+-derived outputs
 
 ---
 
@@ -40,15 +38,15 @@ This project experiments with:
 
 ```bash
 git clone https://github.com/DigiMancer3D/sphincs_bch_hybrid.git
-cd bch-pqc-hybrid
+cd sphincs_bch_hybrid
 make clean && make
 ```
 
-### Test First (Recommended)
+### Testing (Recommended)
 
 ```bash
 ./test_bch_pqc.sh          # Default role 3
-./test_bch_pqc.sh 5        # Role 5
+./test_bch_pqc.sh 5        # Use role 5
 ./test_bch_pqc.sh 0 my_tx.json
 ```
 
@@ -64,10 +62,10 @@ See [USAGE.md](USAGE.md) for detailed instructions.
 
 ## Output Files
 
-| File | Extension   | Description |
-|------|-------------|-----------|
-| Keychain | `.kbch`     | Main output containing EC keys + `sphincs_btc_pipeline_style` |
-| Proof    | `.bchkproof`| Transaction binding and metadata |
+| File       | Extension    | Description                                      |
+|------------|--------------|--------------------------------------------------|
+| Keychain   | `.kbch`      | Main output containing EC keys and SPHINCS+ data |
+| Proof      | `.bchkproof` | Transaction binding and metadata                 |
 
 ---
 
@@ -75,7 +73,7 @@ See [USAGE.md](USAGE.md) for detailed instructions.
 
 **Experimental / Proof of Concept**
 
-This is conceptual research refrence code. This is **not** intended for production use nor use with potential funds, keys, live-transactions; addresses. Although this produces realistic looking keys, they may not be setup properly. The idea in the repo only should be used to show possibilities with SPHINCS+ (SLH-DSA).
+This is research and reference code. It is **not** intended for production use or for managing real funds. While the tool produces realistic secp256k1 private keys that appear compatible with current wallets, they should be treated as experimental. The primary purpose of this project is to explore possibilities with SPHINCS+ (SLH-DSA) in the context of Bitcoin Cash.
 
 ---
 
