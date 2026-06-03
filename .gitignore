@@ -1,0 +1,29 @@
+# Compiled binaries
+bch_pqc_hybrid_single
+*.o
+*.out
+
+# Build artifacts
+build/
+*.dSYM/
+
+# Test output
+test_output/
+
+# macOS
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Backup files
+*.bak
+*.tmp
+
+# Logs
+*.log
+setup.log
+setup_debug.log
