@@ -254,7 +254,7 @@ int main(int argc, char **argv) {
     }
     printf("✓ Detected %s\n", tx.type);
 
-    /* SPHINCS+ */
+    /* SPHINCS+ (SLH-DSA-PURE-SHA2-128s)*/
     OQS_SIG *sig = OQS_SIG_new("SLH_DSA_PURE_SHA2_128S");
     if (!sig) {
         fprintf(stderr, "ERROR: SLH_DSA not available\n");
